@@ -1,0 +1,70 @@
+//write program that converts decimal to binary, octal, and hex
+//use arrays
+//user can imput new number after done
+
+#include<stdio.h>
+#include<cs50.h>
+#include<stdlib.h>
+
+void convert_to_x_base(int, int); //function to call later
+int main(void)
+{
+    int num, choice, base; //declarations
+    while(1)
+    {
+        printf("Select conversion type by entering numbers 1, 2, 3, or 4: \n\n"); //These are the options presented to user
+        printf("1. Decimal to binary \n");
+        printf("2. Decimal to octal \n");
+        printf("3. Decimal to hexadecimal \n");
+        printf("4. Exit \n");
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+        switch(choice)
+        {
+            case 1: //different cases that separates into the base conversions
+                base = 2;
+                break;
+            case 2:
+                base = 8;
+                break;
+            case 3:
+                base = 16;
+                break;
+            case 4:
+                printf("Farewell..."); //gives option to exit the code
+                exit(1);
+            default:
+                printf("READ THE PROMPT AGAIN\n\n"); //In case user enters wrong number
+                continue;
+        }
+        printf("Enter a decimal number: "); //prints the result
+        scanf("%d", &num);
+        printf("Result: ");
+        convert_to_x_base(num, base);
+        printf("\n\n");
+    }
+    return 0; // return 0 to operating system
+}
+
+void convert_to_x_base(int num, int base) //actually calculates
+{
+    int rem;
+    // base condition
+    if (num == 0)
+    {
+        return;
+    }
+    else
+    {
+        rem = num % base; // get the rightmost digit
+        convert_to_x_base(num/base, base);  // recursive call
+        if(base == 16 && rem >= 10) //found this shortcut to base conversion
+        {
+            printf("%c", rem+55);
+        }
+        else
+        {
+            printf("%d", rem);
+        }
+    }
+}
