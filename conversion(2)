@@ -1,0 +1,125 @@
+//write program that converts decimal to binary, octal, and hex
+//use arrays
+//user can imput new number after done
+
+#include<stdio.h>
+#include<cs50.h>
+#include<stdlib.h>
+
+void binary(int A);
+void octal(int A);
+void hex(int A);
+int main(void)
+{
+    int num, choice, base; //declarations
+    while(1)
+    {
+        printf("Select conversion type by entering numbers 1, 2, 3, or 4: \n\n"); //These are the options presented to user
+        printf("1. Decimal to binary \n");
+        printf("2. Decimal to octal \n");
+        printf("3. Decimal to hexadecimal \n");
+        printf("4. Exit \n");
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+    }
+    return 0;
+}
+
+void binary(int A)//breaking functions into ones that only calculate binary, octal, and hex
+{
+    if(choice == 1){
+    int C[1000]; int i=1; int t;
+    while(A>0)
+{
+    C[i]=A%2;
+    A=A/2; t=i; i=i+1;
+}
+    for(int k=t;k>=1;k--)
+{
+    printf("%d",C[k]);}
+}
+}
+
+void octal(int A)
+{
+    if(choice == 2){
+    int C[1000]; int i=1; int t;
+    while(A>0)
+{
+    C[i]=A%8;
+    A=A/8; t=i; i=i+1;
+}
+    for(int k=t;k>=1;k--)
+{
+    printf("%d",C[k]);}
+}
+}
+
+void hex(int A)//function for hex
+{
+    if(choice = 3){
+    int C[1000]; int i=1; int t;
+    while(A>0)
+{
+    C[i]=A%16;
+    A=A/16; t=i; i=i+1;
+}
+    for(int k=t;k>=1;k--)
+{
+       if(C[k]==10)
+    {
+       printf("A");
+    }
+        if(C[k]==11)
+    {
+        printf("B");
+    }
+        if(C[k]==12)
+    {
+        printf("C");
+    }
+        if(C[k]==13)
+    {
+        printf("D");
+    }
+        if(C[k]==14)
+    {
+        printf("E");
+    }
+        if(C[k]==15)
+    {
+        printf("F");
+    }
+        if(C[k]<10)
+    {
+        printf("%d",C[k]);
+    }
+}
+}
+}
+
+switch(choice)//code from previous code
+        {
+            case 1: //different cases that separates into the base conversions
+                base = 2;
+                break;
+            case 2:
+                base = 8;
+                break;
+            case 3:
+                base = 16;
+                break;
+            case 4:
+                printf("Farewell..."); //gives option to exit the code
+                exit(1);
+            default:
+                printf("READ THE PROMPT AGAIN\n\n"); //In case user enters wrong number
+                continue;
+        }
+        printf("Enter a decimal number: "); //prints the result
+        scanf("%d", &num);
+        printf("Result: ");
+        binary(int A);
+        octal(int A);
+        hex(int A);
+        printf("\n\n");
