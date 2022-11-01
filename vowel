@@ -1,0 +1,38 @@
+//TODO: replace vowels with numbers that resemble them for each string entered
+
+#include <cs50.h>
+#include <stdio.h>
+#include <string.h>
+
+string replace(string argv); //function to call later using command line from harvard cs50(argc and argv[])
+
+int main(int argc, string argv[]) //technically could just use one main
+{
+    string result = ""; //defines and prints
+    result = replace(argv[1]);
+    printf("%s\n",result);
+}
+
+string replace(string argv) //function that calculates
+{
+    for (int i = 0; i < strlen(argv); i++) //for loop that runs until strlen
+    {
+        if (argv[i] == 'a' || argv[i] == 'A') //switch according to leetspeak
+        {
+            argv[i] = '6'; //simple code to switch
+        }
+        if (argv[i] == 'e' || argv[i] == 'E')
+        {
+            argv[i] = '3';
+        }
+        if (argv[i] == 'i' || argv[i] == 'I')
+        {
+            argv[i] = '1';
+        }
+        if (argv[i] == 'o' || argv[i] == 'O')
+        {
+            argv[i] = '0';
+        }
+    }
+    return argv; //returns result that will be put in main
+}
