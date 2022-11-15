@@ -1,0 +1,29 @@
+#include<stdio.h>
+int main()
+{
+    int i, j, total, swap, array[50000]; //declares variables, i and j as loop counters, total as total number of elements, array to store inputs
+
+    printf("Number of elements: \n"); //gets number of elements
+    scanf("%d", &total);
+
+    printf("Enter %d elements, pressing return after each number: \n", total); //gets input from user
+    for(i = 0; i < total; i++) //loop to store inputs in array
+    scanf("%d", &array[i]);
+
+    for(i = 1; i < total; i++) //part where the input is sorted
+    {
+    swap = array[i]; //insertion takes a pair on elements and compares them, then puts the smaller one on the left
+    j = i - 1;
+    while((swap < array[j]) && (j >= 0))
+    {
+        array[j + 1] = array[j];
+        j = j - 1;
+    }
+        array[j + 1] = swap;
+    }
+
+    printf("Order of Sorted elements: \n");
+    for(i = 0; i < total; i++)
+    printf("%d, \n", array[i]);
+    return 0;
+}
