@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+void sort(int array[],int n); //function to be called later
+
+int main()
+{
+    int array[50000], n, i; //declares variables, array can be changed when used later
+    printf("Enter number of elements pressing return each time: \n"); //gets number of elements
+    scanf("%d", &n);
+    printf("Enter %d Numbers: \n", n); //gets numbers as array
+    for(i = 0; i < n; i++) //stores all numbers into array
+    scanf("%d", &array[i]);
+
+    sort(array, n); //calls function to sort
+    return 0;
+}
+
+void sort(int array[], int n)
+{
+    int i, j, position, swap;
+    for(i = 0; i < (n - 1); i++) //slowly adds i to one below the array
+    {
+        position = i;
+        for(j = i + 1; j < n; j++) //adds j to n
+        {
+            if(array[position] > array[j]) //selection sort examines each value and gets lowest number to the left
+            position = j;
+        }
+        if(position != i)
+        {
+            swap = array[i];
+            array[i] = array[position];
+            array[position] = swap; //this loop runs until all numbers are checked
+        }
+    }
+    printf("Sorted Array: \n");
+    for(i = 0; i < n; i++)
+    printf("%d, \n", array[i]);
+}
