@@ -1,6 +1,11 @@
-#include<stdio.h>
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
+#include <stdlib.h>
+
 int main()
 {
+    time_t begin = time(NULL);
     int i, j, total, swap, array[50000]; //declares variables, i and j as loop counters, total as total number of elements, array to store inputs
 
     printf("Number of elements: \n"); //gets number of elements
@@ -25,5 +30,31 @@ int main()
     printf("Order of Sorted elements: \n");
     for(i = 0; i < total; i++)
     printf("%d, \n", array[i]);
+    time_t end = time(NULL);
+    printf("The elapsed time is %ld seconds\n", (end - begin));
+    // This program will create same sequence of
+    // random numbers on every program run
+    FILE* fptr;
+
+    // creating a file "random.txt" in "write" mode
+    fptr = fopen("random.txt", "w");
+    int a;
+    if (fptr == NULL) {
+        printf("ERROR");
+        exit(1);
+    }
+
+    for (a = 0; a < 10000; a++) {
+
+        // to generate number less than 100000
+        int val = rand() % 100000;
+
+        // storing data to file
+        fprintf(fptr, "%d ", val);
+    }
+
+    // closing the file
+    fclose(fptr);
+    printf("numbers generated successfully !! ");
     return 0;
 }
