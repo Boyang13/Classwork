@@ -1,4 +1,7 @@
 #include<stdio.h>
+#include <time.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 //merge sort divides the array into halves and then keeps o dividing until further division isn't possible, then sorts them according to value, combining them
 //It is somehwat similar to recursion
@@ -8,6 +11,7 @@ void merge(int a[], int i1, int j1, int i2, int j2); //same variables for above
 
 int main()
 {
+    time_t begin = time(NULL);
     int a[50000], n, i; //defines the array and loop counters
     printf("Enter number of elements: \n"); //gets number of elements
     scanf("%d", &n);
@@ -20,6 +24,32 @@ int main()
 
     for(i = 0; i < n; i++)
     printf("%d, \n", a[i]); //gives output
+    time_t end = time(NULL);
+    printf("The elapsed time is %ld seconds\n", (end - begin));
+    // This program will create same sequence of
+    // random numbers on every program run
+    FILE* fptr;
+
+    // creating a file "random.txt" in "write" mode
+    fptr = fopen("random.txt", "w");
+    int b;
+    if (fptr == NULL) {
+        printf("ERROR");
+        exit(1);
+    }
+
+    for (b = 0; b < 10000; b++) {
+
+        // to generate number less than 100000
+        int val = rand() % 100000;
+
+        // storing data to file
+        fprintf(fptr, "%d ", val);
+    }
+
+    // closing the file
+    fclose(fptr);
+    printf("numbers generated successfully !! ");
     return 0;
 }
 
