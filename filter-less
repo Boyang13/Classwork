@@ -1,0 +1,153 @@
+#include "helpers.h"
+#include <math.h>
+
+// Convert image to grayscale
+//TO DO: take an image and convert it to a black-and-white effect
+/*Steps: Iterate through each pixel
+Calculate the average pixel value
+Round to nearest integer, accounting for floats
+Set each colour value to that calculated average pixel value*/
+
+void grayscale(int height, int width, RGBTRIPLE image[height][width])
+{
+    float colors;
+
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            colors = round((image[j][i].rgbtBlue + image[j][i].rgbtGreen + image[j][i].rgbtRed) / 3.000);
+
+            image[j][i].rgbtBlue = colors;
+            image[j][i].rgbtGreen = colors;
+            image[j][i].rgbtRed = colors;
+        }
+    }
+}
+
+int limit(int RGB)
+{
+    if (RGB > 255)
+    {
+        RGB = 255;
+    }
+    return RGB;
+}
+
+// Convert image to sepia
+//TO DO: write a code that takes a bitmap image and converts it to Sepia like, giving everything a reddish-brown, old-time filter
+/*Steps: Iterate through each pixel. i.e the image height and width
+Calculate each new color value using the Sepia formula
+check if the new color is greater than 255,
+if so, the new color value should be set to 255
+else, the new color value should not be changed*/
+
+void sepia(int height, int width, RGBTRIPLE image[height][width])
+{
+    int sBlue;
+    int sRed;
+    int sGreen;
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            sBlue = limit(round(0.272 * image[j][i].rgbtRed + 0.534 * image[j][i].rgbtGreen + 0.131 * image[j][i].rgbtBlue));
+            sGreen = limit(round(0.349 * image[j][i].rgbtRed + 0.686 * image[j][i].rgbtGreen + 0.168 * image[j][i].rgbtBlue));
+            sRed = limit(round(0.393 * image[j][i].rgbtRed + 0.769 * image[j][i].rgbtGreen + 0.189 * image[j][i].rgbtBlue));
+
+            image[j][i].rgbtBlue = sBlue;
+            image[j][i].rgbtGreen = sGreen;
+            image[j][i].rgbtRed = sRed;
+        }
+    }
+}
+
+// Reflect image horizontally
+//TO DO: swap around the integer elements in the row of the array, which requires using temporary locations to store elements
+/* Iterate through each pixel until the midpoint (because the swaps need only occur from one side till the halfway point).
+Store left-hand side elements in a temporary storage
+Swap right half with left (middle pixel remains unchanged if odd-numbered row)
+Reinsert elements in temp storage back into right side*/
+
+void reflect(int height, int width, RGBTRIPLE image[height][width])
+{
+    RGBTRIPLE temp;
+
+    for (int j = 0; j < width / 2; j++)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            temp = image[i][j];
+            image[i][j] = image[i][width - j - 1];
+            image[i][width - j - 1] = temp;
+        }
+    }
+}
+
+// Blur image
+//use the “box blur,” which works by taking each pixel and, for each color value, giving it a new value by averaging the color values of neighboring pixels
+/*Steps: Create a temporary array on which the blurring loop occurs
+Iterate through the column and row
+Create integer variables and initialise
+If pixel is a corner pixel -
+If pixel is located on the edges -
+If pixel is in the middle -
+Add to red, blue, green counters
+Find the average colour value and set it to the original array*/
+
+void blur(int height, int width, RGBTRIPLE image[height][width])
+{
+    int sumBlue;
+    int sumGreen;
+    int sumRed;
+    float counter;
+    //create a temporary table of colors to not alter the calculations
+    RGBTRIPLE temp[height][width];
+
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            sumBlue = 0;
+            sumGreen = 0;
+            sumRed = 0;
+            counter = 0.00;
+            for (int k = -1; k < 2; k++)
+            {
+                if (j + k < 0 || j + k > height - 1)
+                {
+                    continue;
+                }
+
+                for (int h = -1; h < 2; h++)
+                {
+                    if (i + h < 0 || i + h > width - 1)
+                    {
+                        continue;
+                    }
+
+                    sumBlue += image[j + k][i + h].rgbtBlue;
+                    sumGreen += image[j + k][i + h].rgbtGreen;
+                    sumRed += image[j + k][i + h].rgbtRed;
+                    counter++;
+                }
+            }
+
+            // averages the sum to make picture look blurrier
+            temp[j][i].rgbtBlue = round(sumBlue / counter);
+            temp[j][i].rgbtGreen = round(sumGreen / counter);
+            temp[j][i].rgbtRed = round(sumRed / counter);
+        }
+    }
+
+    //copies values from temporary table
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            image[j][i].rgbtBlue = temp[j][i].rgbtBlue;
+            image[j][i].rgbtGreen = temp[j][i].rgbtGreen;
+            image[j][i].rgbtRed = temp[j][i].rgbtRed;
+        }
+    }
+}
