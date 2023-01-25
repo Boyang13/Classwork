@@ -1,0 +1,214 @@
+#include "helpers.h"
+#include "math.h"
+#include "stdlib.h"
+
+// Convert image to grayscale to convert to black-and-white
+//Calculate averga pixel value and set each color value to the average value, as in filter less
+/*To do this we simply loop through each pixel in the image using a nested loop.
+For each pixel, we define variables for the blue, green and red components of that pixel’s RGBTRIPLE.
+We then calculate an integer average of these three, using round so we get a whole number.
+Finally set each of the blue, green and red components of the RGBTRIPLE to the average just calculated.
+When this has been applied to all pixels in the image, a black and white version will be returned.*/
+
+void grayscale(int height, int width, RGBTRIPLE image[height][width])
+{
+    float rgbGray;
+
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            // averages the color intensity and then applies the same value to all the colors to get gray
+            rgbGray = round((image[j][i].rgbtBlue + image[j][i].rgbtGreen + image[j][i].rgbtRed) / 3.000);
+
+            image[j][i].rgbtBlue = rgbGray;
+            image[j][i].rgbtGreen = rgbGray;
+            image[j][i].rgbtRed = rgbGray;
+        }
+    }
+}
+
+// Reflect image horizontally to get mirror image
+//Switch the positions of the pixels
+/*The logic used here is similar to the previous function, as again we loop through the height and width to perform an operation on each pixel.
+The important distinction here is that we only loop to the halfway point of the width, for reasons which may not be immediately obvious.
+If we simply looped through the entire width and set the value of the current pixel to the equivalent at the other side, by the time we get halfway across the image, half of the pixels would be lost.
+To get around this we loop to the halfway point and set a temporary RGBTRIPLE variable for each pixel.
+The current pixel can now be set to the reflected pixel on the other side of the image, located at image[i][width- (j + 1)].
+The reflected pixel can now be set equal to temp, i.e. the original pixel.
+When this is repeated for every pixel a reflected image will be returned*/
+
+void reflect(int height, int width, RGBTRIPLE image[height][width])
+{
+    int temp[3];
+    for (int j = 0; j < height; j++)
+    {
+        for (int i = 0; i < width / 2; i++)
+        {
+            temp[0] = image[j][i].rgbtBlue;
+            temp[1] = image[j][i].rgbtGreen;
+            temp[2] = image[j][i].rgbtRed;
+
+            // swap pixels with the ones on the opposite side of the picture and viceversa
+            image[j][i].rgbtBlue = image[j][width - i - 1].rgbtBlue;
+            image[j][i].rgbtGreen = image[j][width - i - 1].rgbtGreen;
+            image[j][i].rgbtRed = image[j][width - i - 1].rgbtRed;
+
+            image[j][width - i - 1].rgbtBlue = temp[0];
+            image[j][width - i - 1].rgbtGreen = temp[1];
+            image[j][width - i - 1].rgbtRed = temp[2];
+        }
+    }
+}
+
+
+// Blur image to soften edges
+//Blend the colors on the edges in order to make it more blurry
+//Averages the color of the pixels around the pixel to create an averge color out of 255
+/*Check if each surrounding pixel exists.
+If it does, add each red, green, blue value to the totals. If it doesn’t, ignore it.
+Set the pixel’s red, green and blue values to the average of however many surrounding pixels there are.
+The first step with the code for this one is to duplicate the image into a separate array of RGBTRIPLEs.
+This is required as we require the original surrounding pixels at all times to calculate the averages, which will be removed from the original image once we start blurring.*/
+void blur(int height, int width, RGBTRIPLE image[height][width])
+{
+    int sumBlue;
+    int sumGreen;
+    int sumRed;
+    float counter;
+    //create a temporary table of colors to not alter the calculations
+    RGBTRIPLE temp[height][width];
+
+    /*Next loop through each pixel, as we have done previously.
+    For each pixel, a variable must be declared to store the sums of the red, blue and green
+    values of the surrounding pixels as well as a counter of the amount of surrounding pixels.*/
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            sumBlue = 0;
+            sumGreen = 0;
+            sumRed = 0;
+            counter = 0.00;
+            //For pixels horizontal and vertical
+            for (int k = -1; k < 2; k++)
+            {
+                //Check if pixel is outside rows
+                if (j + k < 0 || j + k > height - 1)
+                {
+                    continue;
+                }
+
+                for (int h = -1; h < 2; h++)
+                {
+                    //Check if pixel is outside columns
+                    if (i + h < 0 || i + h > width - 1)
+                    {
+                        continue;
+                    }
+                    //Otherwise add to sums
+                    sumBlue += image[j + k][i + h].rgbtBlue;
+                    sumGreen += image[j + k][i + h].rgbtGreen;
+                    sumRed += image[j + k][i + h].rgbtRed;
+                    counter++;
+                }
+            }
+            /*To check if the surrounding pixels exist, we must loop one pixel up/down and left/right using k and l.
+            If i + k is outside the range of 0 to the height, then that pixel doesn’t exist in the image and can be skipped.
+            The same logic applies for j + l and the width. Otherwise add the red, blue and green values to the sums and increment the counter.*/
+            temp[j][i].rgbtBlue = round(sumBlue / counter);
+            temp[j][i].rgbtGreen = round(sumGreen / counter);
+            temp[j][i].rgbtRed = round(sumRed / counter);
+        }
+    }
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            image[j][i].rgbtBlue = temp[j][i].rgbtBlue;
+            image[j][i].rgbtGreen = temp[j][i].rgbtGreen;
+            image[j][i].rgbtRed = temp[j][i].rgbtRed;
+        }
+    }
+}
+
+int limit(int RGB)
+{
+    if (RGB > 255)
+    {
+        RGB = 255;
+    }
+    return RGB;
+}
+
+
+// Detect edges to highlight all the boundaries
+//Needs to find large changes in the value of the pixels to find the blurred boundaries
+//Going to multiply surrounding pixels by a different value, and based on result we can see whether there is a boundary
+//Calculate Gx and Gy, changes in the x and y direction for red, green, and blue
+//Also treat border pixels as having 0 value
+//Each new channel value is Gx^2 + Gy^2
+void edges(int height, int width, RGBTRIPLE image[height][width])
+{
+    float sumBlueY;
+    float sumGreenY;
+    float sumRedY;
+    float sumBlueX;
+    float sumGreenX;
+    float sumRedX;
+    float modifierX;
+    float modifierY;
+
+    RGBTRIPLE temp[height][width];
+
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            sumBlueY = 0.0;
+            sumGreenY = 0.0;
+            sumRedY = 0.0;
+            sumBlueX = 0.0;
+            sumGreenX = 0.0;
+            sumRedX = 0.0;
+
+            for (int k = -1; k < 2; k++)
+            {
+                if (j + k < 0 || j + k > height - 1)
+                {
+                    continue;
+                }
+
+                for (int h = -1; h < 2; h++)
+                {
+                    if (i + h < 0 || i + h > width - 1)
+                    {
+                        continue;
+                    }
+                    modifierX = (k + 1 * k - k * abs(h));
+                    modifierY = (h + 1 * h - h * abs(k));
+
+                    sumBlueX += image[j + k][i + h].rgbtBlue * modifierX;
+                    sumGreenX += image[j + k][i + h].rgbtGreen * modifierX;
+                    sumRedX += image[j + k][i + h].rgbtRed * modifierX;
+
+                    sumBlueY += image[j + k][i + h].rgbtBlue * modifierY;
+                    sumGreenY += image[j + k][i + h].rgbtGreen * modifierY;
+                    sumRedY += image[j + k][i + h].rgbtRed * modifierY;
+                }
+            }
+            temp[j][i].rgbtBlue = limit(round(sqrt(sumBlueX * sumBlueX + sumBlueY * sumBlueY)));
+            temp[j][i].rgbtGreen = limit(round(sqrt(sumGreenX * sumGreenX + sumGreenY * sumGreenY)));
+            temp[j][i].rgbtRed = limit(round(sqrt(sumRedX * sumRedX + sumRedY * sumRedY)));
+        }
+    }
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            image[j][i].rgbtBlue = temp[j][i].rgbtBlue;
+            image[j][i].rgbtGreen = temp[j][i].rgbtGreen;
+            image[j][i].rgbtRed = temp[j][i].rgbtRed;
+        }
+    }
+}
