@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "bmp.h"
+
+//TODO: open file, update outfile's header info,
+//read infile's scanline pixel by pixel,
+//resize horizontally, padding, resize vertically
+
+/* for each row:
+        for each pizel in row:
+            write to outfile n times
+        write outfile's padding
+        skip infile's padding
+*/
+
+int main(int argc, char *argv[])
+{
+
+    // Initialize and store file names
+    char *infile = argv[2];
+    char *outfile = argv[3];
+
+    // Check input for proper argument size
+    if (argc != 4)
+    {
+        fprintf(stderr, "Usage: ./resize n infile outfile\n");
+        return 1;
+    }
+
+    // Limits resize factor
+    int factor = atoi(argv[1]);
+    if (factor < 0 || factor > 100)
+    {
+        fprintf(stderr, "Be reasonable\n");
+        return 1;
+    }
+
+    // open input file
+    FILE *inptr = fopen(infile, "r");
+
+    // Check if input file exists
+    if (inptr == NULL)
+    {
+        fprintf(stderr, "Could not open %s.\n", infile);
+        return 2;
+    }
+
+    // open output file
+    FILE *outptr = fopen(outfile, "w");
+
+    // Check if outfile exists
+    if (outptr == NULL)
+    {
+        fclose(inptr);
+        fprintf(stderr, "Could not create %s.\n", outfile);
+        return 3;
+    }
+
+    // Declare header files
+    BITMAPFILEHEADER out_bf;
+    BITMAPINFOHEADER out_bi;
+    BITMAPFILEHEADER in_bf;
+    BITMAPINFOHEADER in_bi;
+
+    // read infile
+    fread(&in_bf, sizeof(BITMAPFILEHEADER), 1, inptr);
+    fread(&in_bi, sizeof(BITMAPINFOHEADER), 1, inptr);
+
+    // Checks for 24-bit uncompressed BMP 4.0
+    if (in_bf.bfType != 0x4d42 || in_bf.bfOffBits != 54 || in_bi.biSize != 40 ||
+        in_bi.biBitCount != 24 || in_bi.biCompression != 0)
+    {
+        fclose(outptr);
+        fclose(inptr);
+        fprintf(stderr, "Unsupported file format\n");
+        return 4;
+    }
+
+    // Generate initial outfile's header files contents
+    out_bf = in_bf;
+    out_bi = in_bi;
+
+    // set new width and height dimensions
+    out_bi.biWidth = in_bi.biWidth * factor;
+    out_bi.biHeight = in_bi.biHeight * factor;
+
+    // determine padding for scanlines
+    int Ipadding = (4 - (in_bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    int Opadding = (4 - (out_bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
+    // Modify biSizeImage in outfile's info header
+    out_bi.biSizeImage = (out_bi.biWidth * sizeof(RGBTRIPLE) + Opadding) * abs(out_bi.biHeight);
+
+    // Modify bfSize in outfile's file header
+    out_bf.bfSize = out_bi.biSizeImage + out_bf.bfOffBits;
+
+    // write outfile headers
+    fwrite(&out_bf, sizeof(BITMAPFILEHEADER), 1, outptr);
+    fwrite(&out_bi, sizeof(BITMAPINFOHEADER), 1, outptr);
+
+    // Write resized data to the outfile
+    // Loop through infile's scanlines
+    for (int i = 0, biHeight = abs(in_bi.biHeight); i < biHeight; i++)
+    {
+        // VERTICAL resizing: write each line factor times
+        for (int x = 0; x < factor; x++)
+        {
+            // iterate over pixels in infile's scanline
+            for (int j = 0; j < in_bi.biWidth; j++)
+            {
+                // temporary storage
+                RGBTRIPLE triple;
+
+                // read RGB triple from infile
+                fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+
+                // Horizontal resizing, write RGB triple to outfile
+                for (int n = 0; n < factor; n++)
+                {
+                    fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+                }
+            }
+
+            // skip over infile padding
+            fseek(inptr, Ipadding, SEEK_CUR);
+
+            // add any necessary padding to outfile
+            // I had to do more research
+            for (int p = 0; p < Opadding; p++)
+            {
+                fputc(0x00, outptr);
+            }
+
+            // move pointer back to begining of the scan line (we need to rewrite the line)
+            // We have to use sizeof(RGBTRIPLE) because width is in pixels not bytes.
+            // fseek moves the pointer to a "byte" location and we are reading triples which are pixels.
+            // 1 pixel = sizeof(RGBTRIPLE) which is 3 types...while... 1 padding = 1 byte
+            fseek(inptr, -((in_bi.biWidth * sizeof(RGBTRIPLE)) + Ipadding), SEEK_CUR);
+        }
+
+        // move pointer ahead to the end of the last scanline to pickup the next scanline
+        fseek(inptr, (in_bi.biWidth * sizeof(RGBTRIPLE)) + Ipadding, SEEK_CUR);
+    }
+
+    // close infile
+    fclose(inptr);
+
+    // close outfile
+    fclose(outptr);
+
+    return 0;
+}
