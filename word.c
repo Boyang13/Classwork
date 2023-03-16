@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+//adds character to end of string array
 void append(char *a, char b)
 {
     int len = strlen(a);
@@ -20,13 +21,17 @@ typedef struct
 Player;
 
 //function that stores player information in file
-void Scoreboard(int guesses, int time)
+void Scoreboard(int guesses, int a)
 {
-
+   //open scoreboard or write to it
+    if (a == 1)
+    {
+        char name[20];
+        char date[20];
         FILE *scoreboard = fopen("scoreboard.txt", "a");
         Player player;
         char playerName[100];
-        player.points = (guesses + 1) * 10 - time * 5;
+        player.points = (guesses + 1) * 10;
         if(player.points < 0)
         {
             player.points = 0;
@@ -34,9 +39,9 @@ void Scoreboard(int guesses, int time)
         printf("\n\nGive name: ");
         scanf("%s", playerName);
         strcpy(player.playerName, playerName);
-
         fprintf(scoreboard, "Name: %s \nPoints: %d\n\n", player.playerName, player.points);
         fclose(scoreboard);
+    }
 }
 
 void printScore(void){
@@ -59,6 +64,7 @@ void printScore(void){
         fclose(fptr);
         printf("\nPress 1 to return to menu:\n");
 }
+
 int printword(char *x, char *y, int z)
 {
     system("clear");
@@ -66,18 +72,20 @@ int printword(char *x, char *y, int z)
     int over = 0;
     for (int i = 0; i < strlen(y); i++)
     {
+        //prints if letter is guessed
         if (strchr(x, y[i]))
         {
             printf("%c", y[i]);
         }
         else
+        //hides if not printed
         {
             printf("_ ");
             over = 1;
         }
     }
-    printf("\nGuessed Letters: %s", x);
-    printf("\nEnter Guess:");
+    printf("\nLetters you have guessed: %s", x);
+    printf("\nEnter your guess:");
     return over;
 }
 
@@ -86,14 +94,13 @@ int receive(int x, int y)
     int w = 0;
     while (w == 0)
     {
+        //checks for integer input
         if (scanf("%d", &w) != 1)
         {
+            //
             int c;
-            while ((c = getchar()) != '\n' && c != EOF)
-            {
-            }
+            while ((c = getchar()) != '\n' && c != EOF){}
         }
-
         for (int i = x; i <= y; i++)
         {
             if (w == i)
@@ -106,35 +113,35 @@ int receive(int x, int y)
     return -1;
 }
 
-void game(int x)
+//contains my two lists and main function to the game
+void list(int x)
 {
     const char *a[10] = {"society", "integratedphysicsandchemistry", "americanidea", "calculusbc", "waterpolo", "frenchtwohonors", "computerscience", "freeblock"};
     const char *b[20] = {"balloon", "golem", "lavahound", "elixergolem", "miner", "rocket", "giant", "electrogiant", "royalgiant", "goblingiant", "royalhogs", "hogrider", "icegolem", "wallbreakers"};
-    srand(time(NULL));
-    int r = rand() % 10;
-    int chances = 7;
-    char right[26];
-    right[0] = '\0';
+    //random pick
+    int r = rand() % 20;
+    int attempts = 5;
+    char correct[26];
+    //clears array
+    correct[0] = '\0';
+    //stores user input
     char g[2];
+    //chooses random word
     char answer[strlen(a[r])];
     char answer1[strlen(b[r])];
+    //gives word based on list chosen by user
     if (x == 1)
     {
-
         strcpy(answer, a[r]);
     }
     else
     {
-
         strcpy(answer, b[r]);
     }
-    time_t start, end;
-    double dif;
-
-    time(&start);
-
-    while (chances > 0 && printword(right, answer, chances) == 1)
+    //prints word until game ends
+    while (attempts > 0 && printword(correct, answer, attempts) == 1)
     {
+        //asks for user input
         if (scanf("%1s", g) != 1)
         {
             int c;
@@ -142,31 +149,32 @@ void game(int x)
             {
             }
         }
-        if (strpbrk(right, &g[0]) != 0)
+        if (strpbrk(correct, &g[0]) != 0)
         {
+            //no response if guessed letter is alreayd guessed
         }
         else if (strpbrk(answer, &g[0]) != 0)
         {
-            append(right, g[0]);
-
+            //adds letter to guessed letters if right
+            append(correct, g[0]);
         }
         else
         {
-            append(right, g[0]);
-            chances--;
+            //if not right, add to guessed letters and decrease attempt
+            append(correct, g[0]);
+            attempts--;
         }
     }
-    time(&end);
-    dif = difftime(end, start);
     system("clear");
-    if (chances == 0)
+    //prints message depending on game outcome
+    if (attempts == 0)
     {
         printf("You lose! The answer was: %s.", answer);
     }
     else
     {
-        printf("You win! Guesses left: %i. Time used: %.1f", chances, dif);
-        Scoreboard(chances, dif);
+        printf("You win! Guesses left: %i. ", attempts);
+        Scoreboard(attempts, 1);
     }
     printf(" Press 1 to return to menu: \n");
 }
@@ -185,24 +193,27 @@ void menu(void)
     int input = receive(1, 5);
     if (input == 1)
     {
-        game(1);
+        //1 = returns to menu to play again after game ends
+        list(1);
         receive(1,1);
         menu();
     }
     if (input == 2)
     {
-        game(2);
+        list(2);
         receive(1,1);
         menu();
     }
     if (input == 3)
     {
+        //goes back to menu when pressed 1
         printf("You have five tries to guess the word from the list. \n The asterisks represent the missing letters, which do not include capitol letters. \n You may type more than one letter at a time. \n The scoreboard will record your points and name. \n Press 1 to return. ");
         receive(1, 1);
         menu();
     }
     if (input == 4)
     {
+        //prints scoreboard with previous attempts
         printScore();
         receive(1, 1);
         menu();
@@ -215,5 +226,6 @@ void menu(void)
 
 int main(int argc, string argv[])
 {
+    //start with menu
     menu();
 }
