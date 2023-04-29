@@ -9,66 +9,68 @@
 #include <curses.h>
 #include <ctype.h>
 
-//declares numbers of the boxes of the game board
-int board[10] = {'0','1','2','3','4','5','6','7','8','9'};
+// declares numbers of the boxes of the game board
+char board[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-//starting menu
+// starting menu
 void start();
 
-//function prototyping
-//prints the menu of the game
+// function prototyping
+// prints the menu of the game
 void menu();
 
-//puts the player's mark on the box that they have chosen
+// puts the player's mark on the box that they have chosen
 void select(int, char);
 
-//contains all the winning conditions and checks if a player satisfies one
+// contains all the winning conditions and checks if a player satisfies one
 bool check();
 
-//general procedure of game
+// general procedure of game
 void game();
 
-//checks if it is a tie
+// checks if it is a tie
 bool check_Full();
 
+//asks user whether they want to use X or O
 char letter();
 
-//some cases depending on what input user chooses
+// some cases depending on what input user chooses
 int main()
 {
-	int a = -1;
-	do
-	{
-		start();
-		scanf("%d", &a);
-		switch(a)
-		{
-		case 1:
-			game();
-			break;
-		case 0:
+    int a = -1;
+    do
+    {
+        start();
+        scanf("%d", &a);
+        switch (a)
+        {
+        case 1:
+            game();
+            break;
+        case 0:
             printf("Goodbye\n");
-			exit(-1);
-		default:
-			printf("Error! Please try again!\n");
-			break;
-		}
-	}while(a);
-	return 0;
+            exit(-1);
+        default:
+            printf("Error! Please try again!\n");
+            break;
+        }
+    } while (a);
+    return 0;
 }
 
-//main function that calls functions and defines players and prints match results
+// main function that calls functions and defines players and prints match results
 void game()
 {
     int choice, player = 1, i;
     int a;
     char piece;
-    letter();
+    piece = letter();
     printf("\n\nWelcome to Tic Tac Toe\n\n");
-    do{
-        //calls function
+    do
+    {
+        // calls function
         menu();
-        if(player % 2)
+        if (player % 2)
         {
             player = 1;
         }
@@ -78,7 +80,7 @@ void game()
         }
         printf("Player %d, enter a number: \n\n", player);
         scanf("%d", &choice);
-        if(player == 1)
+        if (player == 1)
         {
             piece = 'X';
         }
@@ -89,19 +91,20 @@ void game()
         select(choice, piece);
         i = check();
         a = check_Full();
-        player ++;
-    }while(i == false && a == false);
+        player++;
+    } while (i == false && a == false);
     menu();
-    if(i == true)
+    if (i == true)
         printf("Player %d has won the game!\n", --player);
-    if(a == true)
+    if (a == true)
         printf("This is a tie game!\n");
-    if(i == true || a == true)
+    if (i == true || a == true)
         board[1] = '1', board[2] = '2', board[3] = '3', board[4] = '4', board[5] = '5', board[6] = '6', board[7] = '7', board[8] = '8', board[9] = '9';
 }
 
 void start()
 {
+    printf("\e[1;1H\e[2J");
     printf("##########################################\n");
     printf("#Tic-Tac_Toe                             #\n");
     printf("#Instructions: Line up three to win!     #\n");
@@ -114,8 +117,9 @@ void start()
 
 void menu()
 {
+    printf("\e[1;1H\e[2J");
     printf("Player 1 = (X)    Player 2 = (O)\n\n");
-    printf(" %c | %c | %c \n",board[1], board[2], board[3]);
+    printf(" %c | %c | %c \n", board[1], board[2], board[3]);
     printf("---|---|--- \n");
     printf(" %c | %c | %c \n", board[4], board[5], board[6]);
     printf("---|---|--- \n");
@@ -141,53 +145,45 @@ char letter()
 
 void select(int choice, char piece)
 {
-    //inputs players choice to the corresponding board
-    if(choice == 1 && board[1] == '1')
-        board[1] = piece;
-    else if(choice == 2 && board[2] == '2')
-        board[2] = piece;
-    else if(choice == 3 && board[3] == '3')
-        board[3] = piece;
-    else if(choice == 4 && board[4] == '4')
-        board[4] = piece;
-    else if (choice == 5 && board[5] == '5')
-        board[5] = piece;
-    else if (choice == 6 && board[6] == '6')
-        board[6] = piece;
-    else if (choice == 7 && board[7] == '7')
-        board[7] = piece;
-    else if (choice == 8 && board[8] == '8')
-        board[8] = piece;
-    else if (choice == 9 && board[9] == '9')
-        board[9] = piece;
-    else
+    // inputs players choice to the corresponding board
+    int a = 0;
+    for (int i = 1; i <= 9; i++)
+    {
+        if (choice == i && board[i] != 'X' && board[i] != 'O')
+        {
+            board[i] = piece;
+            a++;
+        }
+    }
+    if (a == 0)
     {
         printf("INVALID MOVE\n");
     }
+    printf("%i",a);
 }
 
 bool check()
 {
-    //checks the vertical columns for a winning line
-    if (board[1]== board[4] && board[4]== board[7])
+    // checks the vertical columns for a winning line
+    if (board[1] == board[4] && board[4] == board[7])
         return true;
-    else if(board[2]== board[5] && board[5]== board[8])
+    else if (board[2] == board[5] && board[5] == board[8])
         return true;
-    else if(board[3]== board[6] && board[6]== board[9])
-        return true;
-
-    //checks the horizontal rows for a winning line
-    else if(board[1] == board[2] && board[2] == board[3])
-        return true;
-    else if(board[4]== board[5] && board[5]== board[6])
-        return true;
-    else if (board[7]== board[8] && board[8]== board[9])
+    else if (board[3] == board[6] && board[6] == board[9])
         return true;
 
-    //checks the two diagonals for a winning line
-    else if(board[1]== board[5] && board[5]== board[9])
+    // checks the horizontal rows for a winning line
+    else if (board[1] == board[2] && board[2] == board[3])
         return true;
-    else if(board[3]== board[5] && board[5]== board[7])
+    else if (board[4] == board[5] && board[5] == board[6])
+        return true;
+    else if (board[7] == board[8] && board[8] == board[9])
+        return true;
+
+    // checks the two diagonals for a winning line
+    else if (board[1] == board[5] && board[5] == board[9])
+        return true;
+    else if (board[3] == board[5] && board[5] == board[7])
         return true;
 
     else
