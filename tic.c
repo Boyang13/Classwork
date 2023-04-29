@@ -34,7 +34,7 @@ void game();
 // checks if it is a tie
 bool check_Full();
 
-// asks user whether they want to use X or O
+// asks user whether they want to use X or O. This is a 2 person game so who goes first depends on the person's answer
 char letter();
 
 // some cases depending on what input user chooses
