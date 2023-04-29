@@ -10,6 +10,8 @@
 #include <ctype.h>
 #include <unistd.h>
 
+//Overall code inspired by https://www.geeksforgeeks.org/validity-of-a-given-tic-tac-toe-board-configuration/#
+
 // declares numbers of the boxes of the game board
 char board[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
@@ -141,6 +143,7 @@ void menu()
 char letter()
 {
     char piece;
+    //credit: https://stackoverflow.com/questions/66927511/what-does-e-do-what-does-e11h-e2j-do
     printf("\e[1;1H\e[2J");
     printf("Use X or O?");
     do
@@ -168,11 +171,11 @@ void select(int choice, char piece)
     }
     if (a == 0)
     {
+        //credit: https://notes.burke.libbey.me/ansi-escape-codes/
         printf("\x1b[1F");
         printf("\x1b[2K");
         printf("INVALID MOVE\n");
     }
-    printf("%i", a);
 }
 
 bool check()
