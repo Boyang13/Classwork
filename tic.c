@@ -121,6 +121,8 @@ void start()
     printf("#Instructions: Line up three to win!     #\n");
     printf("# Enter the number displayed on the      #\n");
     printf("# specific box during your turn.         #\n");
+    printf("# Entering an invalid move gives.        #\n");
+    printf("# opponent an extra turn!                #\n");
     printf("#1. Play                                 #\n");
     printf("#0. Exit Program                         #\n");
     printf("##########################################\n");
@@ -130,6 +132,7 @@ void menu()
 {
     printf("generating...\n");
     sleep(1);
+    printf("\e[1;1H\e[2J");
     printf("\e[1;1H\e[2J");
     printf("Player 1 = (X)    Player 2 = (O)\n\n");
     printf(" %c | %c | %c \n", board[1], board[2], board[3]);
