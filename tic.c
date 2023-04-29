@@ -99,11 +99,11 @@ void game()
     menu();
     if (i == true)
     {
-        printf("Player %d has won the game!\n", --player);
+        printf("PLAYER %d HAS WON THE GAME!\n", --player);
     }
     if (a == true)
     {
-        printf("This is a tie game!\n");
+        printf("THIS IS A TIE GAME!\n");
     }
     if (i == true || a == true)
     {
@@ -114,7 +114,7 @@ void game()
 void start()
 {
     printf("loading...\n");
-    sleep(3);
+    sleep(1);
     printf("\e[1;1H\e[2J");
     printf("##########################################\n");
     printf("#Tic-Tac_Toe                             #\n");
@@ -129,7 +129,7 @@ void start()
 void menu()
 {
     printf("generating...\n");
-    sleep(2);
+    sleep(1);
     printf("\e[1;1H\e[2J");
     printf("Player 1 = (X)    Player 2 = (O)\n\n");
     printf(" %c | %c | %c \n", board[1], board[2], board[3]);
