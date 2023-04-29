@@ -126,6 +126,7 @@ void start()
 
 void menu()
 {
+    printf("generating...\n");
     sleep(2);
     printf("\e[1;1H\e[2J");
     printf("Player 1 = (X)    Player 2 = (O)\n\n");
